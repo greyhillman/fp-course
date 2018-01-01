@@ -13,21 +13,12 @@ import Course.List
 import Course.Optional
 
 -- | Eliminates any value over which a functor is defined.
-vooid ::
-  Functor m =>
-  m a
-  -> m ()
-vooid =
-  (<$>) (const ())
+vooid :: Functor m => m a -> m ()
+vooid = (<$>) (const ())
 
 -- | A version of @bind@ that ignores the result of the effect.
-(>-) ::
-  Monad m =>
-  m a
-  -> m b
-  -> m b
-(>-) a =
-  (>>=) a . const
+(>-) :: Monad m => m a -> m b -> m b
+(>-) a = (>>=) a . const
 
 -- | Runs an action until a result of that action satisfies a given predicate.
 untilM ::
@@ -80,10 +71,11 @@ data Op =
 -- /Tip:/ @putStr :: String -> IO ()@ -- Prints a string to standard output.
 --
 -- /Tip:/ @putStrLn :: String -> IO ()@ -- Prints a string and then a new line to standard output.
-convertInteractive ::
-  IO ()
-convertInteractive =
-  error "todo: Course.Interactive#convertInteractive"
+convertInteractive :: IO ()
+convertInteractive = do
+    line <- getLine
+    let upperLine = map toUpper line
+    putStrLn upperLine
 
 -- |
 --
@@ -108,10 +100,14 @@ convertInteractive =
 -- /Tip:/ @putStr :: String -> IO ()@ -- Prints a string to standard output.
 --
 -- /Tip:/ @putStrLn :: String -> IO ()@ -- Prints a string and then a new line to standard output.
-reverseInteractive ::
-  IO ()
-reverseInteractive =
-  error "todo: Course.Interactive#reverseInteractive"
+reverseInteractive :: IO ()
+reverseInteractive = do
+    putStr "Enter file name to reverse: "
+    fileName <- getLine
+    putStr "Enter file name to output reverse contents: "
+    reverseFileName <- getLine
+    contents <- readFile fileName
+    writeFile reverseFileName (reverse contents)
 
 -- |
 --
@@ -134,10 +130,19 @@ reverseInteractive =
 -- /Tip:/ @putStr :: String -> IO ()@ -- Prints a string to standard output.
 --
 -- /Tip:/ @putStrLn :: String -> IO ()@ -- Prints a string and then a new line to standard output.
-encodeInteractive ::
-  IO ()
-encodeInteractive =
-  error "todo: Course.Interactive#encodeInteractive"
+encodeInteractive :: IO ()
+encodeInteractive = do
+    putStr "Enter string to url-encode: "
+    url <- getLine
+    putStrLn (urlEncode url)
+
+urlEncode :: Chars -> Chars
+urlEncode = foldRight ((++) . convert) Nil
+    where
+        convert ' ' = "%20"
+        convert '\t' = "%09"
+        convert '"' = "%22"
+        convert x = x :. Nil
 
 interactive ::
   IO ()
